@@ -1,8 +1,14 @@
 name: Update HOT bridge data
 on:
   schedule:
-    - cron: '7,37 * * * *'
+    # GitHub schedules are best-effort, not precise timers.
+    # A changed cron value also re-registers the scheduled trigger.
+    - cron: '17,47 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update.yml'
 permissions:
   contents: write
 concurrency:
@@ -12,6 +18,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      - name: Show trigger details
+        run: echo "Event=$GITHUB_EVENT_NAME; UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
