@@ -56,11 +56,27 @@ function plotChart(canvasId, emptyId, points, metricKey, color, colorFade) {
   c.fillText(validPoints[0].date,pad.l,h-8);
   c.textAlign='right';c.fillText(validPoints[validPoints.length-1].date,w-pad.r,h-8);
 }
+// Read the public repository directly: GITHUB_TOKEN data commits do not
+// trigger GitHub Pages branch builds, so the published site's local JSON
+// can remain older than the data stored on the main branch.
+const PUBLIC_DATA_URL = 'https://raw.githubusercontent.com/ConorTttttt/holo-unyt-tracker/main/data/bridge.json';
+async function fetchLatestBridgeData(){
+  const urls = [PUBLIC_DATA_URL, 'data/bridge.json'];
+  let lastError;
+  for(const url of urls){
+    try {
+      const res = await fetch(url + '?t=' + Date.now(), {cache: 'no-store'});
+      if(!res.ok) throw new Error('Data request failed: ' + res.status);
+      const data = await res.json();
+      if(data.schemaVersion !== 2) throw new Error('Unexpected data format');
+      return data;
+    } catch(error) { lastError = error; }
+  }
+  throw lastError || new Error('Could not load bridge data');
+}
 async function load(){
   try{
-    const res=await fetch('data/bridge.json?cache='+Date.now(),{cache:'no-store'});
-    if(!res.ok)throw new Error('Data request failed');
-    const data=await res.json();
+    const data=await fetchLatestBridgeData();
     if (data.schemaVersion !== 2) {
       $('status').textContent='● Older data format — run the updated GitHub Actions workflow';
       return;
@@ -79,7 +95,8 @@ async function load(){
     $('deposit-events').textContent=intFmt(data.depositTransfers);
     $('new-wallets-7d').textContent=intFmt(data.newDepositingWallets7d);
     const date=new Date(data.updatedAt);
-    $('status').textContent='● Last updated '+date.toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'UTC'})+' UTC · Auto-sync every 30 minutes';
+    const stale = !Number.isFinite(date.getTime()) || Date.now() - date.getTime() > 90 * 60 * 1000;
+    $('status').textContent='● Last successful data sync '+date.toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short',timeZone:'UTC'})+' UTC · '+(stale ? '⚠ Scheduled updates delayed; check GitHub Actions' : 'GitHub schedule: approximately every 30 minutes (best effort)');
     const txs=data.recentTransactions||[];
     $('transactions').innerHTML=txs.length?txs.map(tx=>{
       const incoming=tx.direction==='in',admin=tx.direction==='admin',hash=String(tx.hash||'');
@@ -91,7 +108,9 @@ async function load(){
       plotChart('chart','emptychart',data.timeline,'cumulativeDeposited','#5ce1c0','#5ce1c044');
       plotChart('wallet-chart','empty-wallet-chart',data.walletTimeline,'uniqueWallets','#84b6ff','#84b6ff44');
     };
-    redraw();window.addEventListener('resize',redraw);
+    redraw();window.onresize=redraw;
   }catch(e){$('status').textContent='● Unable to load data — check GitHub Actions and refresh';console.error(e)}
 }
 load();
+// Keep an open dashboard fresh even when GitHub Pages is not rebuilt.
+setInterval(load, 5 * 60 * 1000);
