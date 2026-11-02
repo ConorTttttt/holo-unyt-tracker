@@ -1,29 +1,29 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-11-02T15:01:15.460673+00:00",
+  "updatedAt": "2026-11-02T15:30:50.088387+00:00",
   "source": "Ethereum mainnet / Etherscan API V2",
   "bridge": "0x8334c5f8fdb1200d80210c9ccc314664b51a0bcd",
   "token": "0x6c6ee5e31d828de241282b9606c8e98ea48526e2",
   "orderbook": "0x37fc0efec37d19f8a221aa4f8f7600c9ba2acd20",
   "decimals": 18,
-  "snapshotBlock": 26327856,
+  "snapshotBlock": 26328003,
   "scanFromBlock": 26298741,
   "lockCounterChecked": true,
   "metricsMethod": "Verified Lock and AdminWithdraw logs; live vaultBalance; claims inferred from vault reconciliation",
-  "currentLocked": "3458744.934245",
+  "currentLocked": "6017067.770248",
   "totalSupply": "177619433541.1413123443803357",
-  "percentOfSupplyLocked": "0.001947278439801951116382939641",
-  "totalDeposited": "3458904.934245",
+  "percentOfSupplyLocked": "0.003387617925745883841102706600",
+  "totalDeposited": "6017227.770248",
   "totalWithdrawn": "160",
   "estimatedClaimed": "160",
   "adminWithdrawn": "0",
-  "depositTransfers": 12,
-  "depositTransactions": 12,
+  "depositTransfers": 15,
+  "depositTransactions": 15,
   "uniqueDepositingWallets": 10,
   "newDepositingWallets7d": 10,
   "adminWithdrawalEvents": 0,
   "withdrawalTransfers": null,
-  "trackedEvents": 12,
+  "trackedEvents": 15,
   "timeline": [
     {
       "date": "2026-10-30",
@@ -37,8 +37,8 @@
     },
     {
       "date": "2026-11-02",
-      "cumulativeDeposited": "3458904.934245",
-      "deposited": "3458310.521012"
+      "cumulativeDeposited": "6017227.770248",
+      "deposited": "6016633.357015"
     }
   ],
   "walletTimeline": [
@@ -59,6 +59,27 @@
     }
   ],
   "recentTransactions": [
+    {
+      "hash": "0x157f37c75a7b326c87c462dce128078a371f4127a640e65f60307eb614e8ceaa",
+      "direction": "in",
+      "amount": "454982",
+      "date": "2026-11-02T15:25:35+00:00",
+      "counterparty": "0x2a79096868e40b979607bcce7c904e0430fef6e3"
+    },
+    {
+      "hash": "0xad6f13a62145d46b5f1881192168301d45679a20d07950909195348bcd3767ba",
+      "direction": "in",
+      "amount": "1939410.924664",
+      "date": "2026-11-02T15:13:59+00:00",
+      "counterparty": "0x2a79096868e40b979607bcce7c904e0430fef6e3"
+    },
+    {
+      "hash": "0xf582d1e1dda7dd69599028a9edf0101ec347d84bd6fca78ac6ba39a29ab542d3",
+      "direction": "in",
+      "amount": "163929.911339",
+      "date": "2026-11-02T15:05:47+00:00",
+      "counterparty": "0x2a79096868e40b979607bcce7c904e0430fef6e3"
+    },
     {
       "hash": "0xa0d375cb2b3d8945807eabf7d44bf24b7ffdc919cdb592d6eafb805c291fbb73",
       "direction": "in",
