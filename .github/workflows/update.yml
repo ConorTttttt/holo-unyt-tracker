@@ -3,7 +3,7 @@ on:
   schedule:
     # GitHub schedules are best-effort, not precise timers.
     # A changed cron value also re-registers the scheduled trigger.
-    - cron: '17,47 * * * *'
+    - cron: '19,49 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
