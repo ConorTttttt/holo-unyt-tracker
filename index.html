@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="Unofficial, community-made HOT to Unyt Ethereum bridge tracking dashboard. Not affiliated with Holo or Unyt.">
+  <title>Unofficial Community Tracker — HOLO / Unyt Bridge</title>
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body>
+  <div class="glow"></div>
+  <main class="wrap">
+    <header class="topbar">
+      <div class="brand"><span class="mark">H</span><div><b>HOLO <span class="slash">/</span> UNYT</b><small>UNOFFICIAL COMMUNITY TRACKER</small></div></div>
+      <a class="explorer" href="https://etherscan.io/address/0x8334c5f8fdb1200d80210c9ccc314664b51a0bcd#tokentxns" target="_blank" rel="noopener">View on Etherscan ↗</a>
+    </header>
+    <section class="hero">
+      <div class="eyebrow"><span class="pulse"></span> ETHEREUM MAINNET <span class="divider">/</span> HOT TOKEN</div>
+      <h1>HOLO <em>Bridge Tracker</em></h1>
+      <p>An independently created community dashboard for the HOT bridge. Based on verified Ethereum contract events and public Raindex vault accounting.</p>
+      <div class="updated" id="status">● Waiting for first data sync</div>
+    </section>
+    <aside class="community-notice" aria-label="Unofficial community tracker notice">
+      <span class="notice-icon" aria-hidden="true">ⓘ</span>
+      <div><strong>Unofficial · Made by a community member</strong>
+      <p>This is an independent community project, <b>not an official Holo or Unyt tool</b>. It is not operated by, affiliated with, or endorsed by Holo, Unyt, or their teams. Data is sourced from public Ethereum records.</p></div>
+    </aside>
+    <section class="cards" aria-label="Bridge statistics">
+      <div class="card primary"><div class="label">CURRENTLY LOCKED <span>↗</span></div><div class="value" id="locked">—</div><div class="unit">HOT in Raindex vault</div><div class="cardfoot">Bridge vaultBalance() <span>🔒</span></div></div>
+      <div class="card supply-card"><div class="label">HOT SUPPLY BRIDGED <span>%</span></div><div class="value" id="bridged-percent">—</div><div class="unit">of total HOT token supply in vault</div><div class="supply-progress" id="supply-progress" role="progressbar" aria-label="Percentage of HOT total supply locked in bridge vault" aria-valuemin="0" aria-valuemax="100" aria-valuetext="Waiting for bridge data"><div class="supply-progress-fill" id="supply-progress-fill"></div></div><div class="supply-total" id="supply-total">Total supply: — HOT</div><div class="cardfoot">Vault balance ÷ ERC-20 totalSupply</div></div>
+      <div class="card"><div class="label">TOTAL BRIDGED IN <span>↙</span></div><div class="value" id="deposited">—</div><div class="unit">HOT locked via Lock events</div><div class="cardfoot"><span id="deposits-count">—</span> verified Lock events</div></div>
+      <div class="card"><div class="label">TOTAL RELEASED FROM VAULT <span>↗</span></div><div class="value" id="withdrawn">—</div><div class="unit">HOT no longer in the vault</div><div class="cardfoot">Claim estimate + recorded admin releases</div></div>
+    </section>
+    <section class="cards vault-cards" aria-label="Vault withdrawal breakdown">
+      <div class="card"><div class="label">ESTIMATED CLAIM RELEASES <span>↗</span></div><div class="value" id="estimated-claimed">—</div><div class="unit">HOT exited vault, excluding logged admin withdrawals</div><div class="cardfoot">Inferred from vault reconciliation; individual claims not directly counted</div></div>
+      <div class="card"><div class="label">EMERGENCY ADMIN RELEASES <span>⚠</span></div><div class="value" id="admin-withdrawn">—</div><div class="unit">HOT from verified AdminWithdraw events</div><div class="cardfoot"><span id="admin-count">—</span> admin withdrawal events</div></div>
+    </section>
+    <p class="accounting-note"><strong>Reading the withdrawal figures:</strong> the current vault balance and <code>Lock</code>/<code>AdminWithdraw</code> events are measured on Ethereum. Total vault outflow is calculated as total locked minus the latest vault balance. Claim releases are the remainder after logged admin withdrawals, so they are <strong>inferred</strong> rather than individually verified claims. The collector refuses inconsistent accounting.</p>
+    <section class="cards wallet-cards" aria-label="Bridge adoption statistics">
+      <div class="card adoption-card"><div class="label">UNIQUE LOCKING WALLETS <span>◉</span></div><div class="value" id="unique-wallets">—</div><div class="unit">distinct Ethereum addresses in Lock events</div><div class="cardfoot">Each sender counted once, ever</div></div>
+      <div class="card"><div class="label">LOCK TRANSACTIONS <span>↙</span></div><div class="value" id="deposit-transactions">—</div><div class="unit">unique Ethereum transactions emitting Lock</div><div class="cardfoot"><span id="deposit-events">—</span> verified Lock events</div></div>
+      <div class="card"><div class="label">NEW LOCKING WALLETS · 7 DAYS <span>＋</span></div><div class="value" id="new-wallets-7d">—</div><div class="unit">addresses making their first-ever deposit</div><div class="cardfoot">Rolling 7 days ending at last sync (UTC)</div></div>
+    </section>
+    <div class="charts">
+      <section class="panel chartPanel"><div class="panelheading"><div><h2>Cumulative HOT deposits over time</h2><p>Sum of verified Lock events by day (UTC); not a historical vault balance</p></div><span class="tag">HISTORICAL</span></div><div class="chartbox"><canvas id="chart" role="img" aria-label="Historical cumulative HOT deposits through bridge Lock events"></canvas><div id="emptychart" class="empty">Chart appears after the first successful sync.</div></div></section>
+      <section class="panel chartPanel"><div class="panelheading"><div><h2>Unique locking wallets over time</h2><p>Cumulative distinct Lock event senders, by day (UTC)</p></div><span class="tag">ADOPTION</span></div><div class="chartbox"><canvas id="wallet-chart" role="img" aria-label="Cumulative unique Ethereum deposit senders chart"></canvas><div id="empty-wallet-chart" class="empty">Chart appears after the first successful sync.</div></div></section>
+    </div>
+    <section class="panel"><div class="panelheading"><div><h2>Recent verified bridge contract events</h2><p>Lock deposits and emergency admin releases; coupon claims are not listed individually</p></div><a href="https://etherscan.io/address/0x8334c5f8fdb1200d80210c9ccc314664b51a0bcd#tokentxns" target="_blank" rel="noopener">View bridge ↗</a></div><div class="tablewrap"><table><thead><tr><th>DIRECTION</th><th>AMOUNT (HOT)</th><th>DATE (UTC)</th><th>TRANSACTION</th></tr></thead><tbody id="transactions"><tr><td colspan="4" class="emptycell">Waiting for data…</td></tr></tbody></table></div></section>
+    <footer><p class="footer-disclaimer"><b>Unofficial community project.</b> Created by a community member, independently of Holo and Unyt. This site is not operated by, affiliated with, or endorsed by either project.</p><p><b>About these numbers.</b> Current HOT locked is read from the Raindex vault, and incoming deposits are counted using verified Lock events. The released total uses total locks minus the latest vault balance; the claim component is an accounting estimate after subtracting AdminWithdraw events, not a verified list of claim transactions. Data read from Etherscan is not an atomic snapshot, so in-flight blocks can briefly cause differences. These Ethereum events cannot confirm mirrored issuance, collection or HoloFuel swaps on Unyt. The percentage is based on the Ethereum ERC-20 on-chain totalSupply, not an externally estimated circulating supply. Unique locking wallets count distinct sender addresses recorded in Lock events (possibly smart contracts), not people or verified Unyt accounts. New wallets means first Lock event within the last 7 days.</p><p>Bridge <a target="_blank" rel="noopener" href="https://etherscan.io/address/0x8334c5f8fdb1200d80210c9ccc314664b51a0bcd">0x8334…0bcd</a> · HOT ERC-20 <a target="_blank" rel="noopener" href="https://etherscan.io/token/0x6c6ee5e31d828de241282b9606c8e98ea48526e2">0x6c6e…26e2</a> · Public Ethereum data; not an official project dashboard.</p></footer>
+  </main><script src="script.js?v=2" defer></script>
+</body>
+</html>
