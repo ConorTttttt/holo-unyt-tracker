@@ -1,29 +1,29 @@
 {
   "schemaVersion": 2,
-  "updatedAt": "2026-11-06T18:00:56.658465+00:00",
+  "updatedAt": "2026-11-06T18:30:47.111862+00:00",
   "source": "Ethereum mainnet / Etherscan API V2",
   "bridge": "0x8334c5f8fdb1200d80210c9ccc314664b51a0bcd",
   "token": "0x6c6ee5e31d828de241282b9606c8e98ea48526e2",
   "orderbook": "0x37fc0efec37d19f8a221aa4f8f7600c9ba2acd20",
   "decimals": 18,
-  "snapshotBlock": 26357465,
+  "snapshotBlock": 26357613,
   "scanFromBlock": 26298741,
   "lockCounterChecked": true,
   "metricsMethod": "Verified Lock and AdminWithdraw logs; live vaultBalance; claims inferred from vault reconciliation",
-  "currentLocked": "9938821.671248",
+  "currentLocked": "10438821.671248",
   "totalSupply": "177619433541.1413123443803357",
-  "percentOfSupplyLocked": "0.005595571088760345934174631091",
-  "totalDeposited": "9939041.671248",
+  "percentOfSupplyLocked": "0.005877071817611722946302950829",
+  "totalDeposited": "10439041.671248",
   "totalWithdrawn": "220",
   "estimatedClaimed": "220",
   "adminWithdrawn": "0",
-  "depositTransfers": 25,
-  "depositTransactions": 25,
-  "uniqueDepositingWallets": 17,
-  "newDepositingWallets7d": 16,
+  "depositTransfers": 26,
+  "depositTransactions": 26,
+  "uniqueDepositingWallets": 18,
+  "newDepositingWallets7d": 17,
   "adminWithdrawalEvents": 0,
   "withdrawalTransfers": null,
-  "trackedEvents": 25,
+  "trackedEvents": 26,
   "timeline": [
     {
       "date": "2026-10-30",
@@ -49,6 +49,11 @@
       "date": "2026-11-05",
       "cumulativeDeposited": "9939041.671248",
       "deposited": "830820"
+    },
+    {
+      "date": "2026-11-06",
+      "cumulativeDeposited": "10439041.671248",
+      "deposited": "500000"
     }
   ],
   "walletTimeline": [
@@ -76,9 +81,21 @@
       "date": "2026-11-05",
       "uniqueWallets": 17,
       "newWallets": 2
+    },
+    {
+      "date": "2026-11-06",
+      "uniqueWallets": 18,
+      "newWallets": 1
     }
   ],
   "recentTransactions": [
+    {
+      "hash": "0x6192b433de8a868fcbfc09f895e174d6fb6187856b3020aa6cb22ebf2736ac84",
+      "direction": "in",
+      "amount": "500000",
+      "date": "2026-11-06T18:23:59+00:00",
+      "counterparty": "0x6428178a1324896bd8ea897565d909945da33ee9"
+    },
     {
       "hash": "0x32c5b71fa92ee88b0f559a8f640abc7618c42996b8a1a29020b087bee976a69b",
       "direction": "in",
@@ -211,13 +228,6 @@
       "amount": "160434",
       "date": "2026-11-02T05:17:35+00:00",
       "counterparty": "0x2a79096868e40b979607bcce7c904e0430fef6e3"
-    },
-    {
-      "hash": "0xdce88a9adec3320583540c62e9c64285ff1166d91333c1cae439b1725305feeb",
-      "direction": "in",
-      "amount": "100000",
-      "date": "2026-11-02T03:43:59+00:00",
-      "counterparty": "0xf85ad11a62a07ad666ad124801995d38e58003a2"
     }
   ],
   "note": "Ethereum Lock senders are distinct addresses, not verified Unyt accounts or people. HOT exited from the vault = Lock events - current vaultBalance(); admin exits come from AdminWithdraw events; the remainder is an inferred claim total, not a direct count of individual coupon claims. Historical chart shows cumulative locks, not historical vault balance."
