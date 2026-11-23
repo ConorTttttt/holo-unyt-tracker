@@ -1,6 +1,11 @@
 const $ = id => document.getElementById(id);
 const formatHOT = v => v == null ? '—' : Number(v).toLocaleString('en-GB',{maximumFractionDigits:2});
 const intFmt = v => v == null ? '—' : Number(v).toLocaleString('en-GB');
+const fmtUSD = v => v == null || !Number.isFinite(Number(v)) || Number(v) < 0 ? '—' :
+  Number(v).toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:2});
+const fmtHOTPriceUSD = v => v == null || !Number.isFinite(Number(v)) || Number(v) <= 0 ? '—' :
+  Number(v).toLocaleString('en-US', {style:'currency', currency:'USD',
+    minimumFractionDigits:6, maximumFractionDigits:10});
 function formatPercent(v) {
   if (v == null || !Number.isFinite(Number(v))) return '—';
   const n = Number(v);
@@ -86,6 +91,12 @@ async function load(){
     $('deposited').textContent=formatHOT(data.totalDeposited);
     $('withdrawn').textContent=formatHOT(data.totalWithdrawn);
     setBridgeShare(data);
+    $('tvl-usd').textContent=fmtUSD(data.tvlUsd);
+    $('hot-price-usd').textContent=fmtHOTPriceUSD(data.hotPriceUsd);
+    const priceDate = data.priceUpdatedAt ? new Date(data.priceUpdatedAt) : null;
+    $('price-updated').textContent = priceDate && Number.isFinite(priceDate.getTime()) && data.tvlUsd != null
+      ? 'CoinGecko quote: ' + priceDate.toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'short',timeZone:'UTC'}) + ' UTC'
+      : 'Price unavailable · optional API key required';
     $('deposits-count').textContent=intFmt(data.depositTransfers);
     $('estimated-claimed').textContent=formatHOT(data.estimatedClaimed);
     $('admin-withdrawn').textContent=formatHOT(data.adminWithdrawn);
