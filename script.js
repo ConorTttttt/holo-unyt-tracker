@@ -96,7 +96,7 @@ async function load(){
     const priceDate = data.priceUpdatedAt ? new Date(data.priceUpdatedAt) : null;
     $('price-updated').textContent = priceDate && Number.isFinite(priceDate.getTime()) && data.tvlUsd != null
       ? 'CoinGecko quote: ' + priceDate.toLocaleString('en-GB', {dateStyle:'medium',timeStyle:'short',timeZone:'UTC'}) + ' UTC'
-      : 'Price unavailable · optional API key required';
+      : 'CoinGecko price unavailable';
     $('deposits-count').textContent=intFmt(data.depositTransfers);
     $('estimated-claimed').textContent=formatHOT(data.estimatedClaimed);
     $('admin-withdrawn').textContent=formatHOT(data.adminWithdrawn);
