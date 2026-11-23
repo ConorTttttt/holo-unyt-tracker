@@ -27,6 +27,10 @@
 .footer-disclaimer{padding:13px 15px;border-left:3px solid #6cb6c8;background:#142135;color:#b9d4e0}
 @media(max-width:760px){.community-notice{padding:14px;gap:10px;margin-bottom:20px}.community-notice strong{font-size:13px}.community-notice p{font-size:12px}}
 
+/* Market-value estimate: distinct from verified on-chain HOT accounting. */
+.market-cards{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:18px}
+@media(max-width:760px){.market-cards{grid-template-columns:1fr}}
+
 /* Verified vault exits, with a clear distinction between observed and inferred flows */
 .vault-cards{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:18px}
 .accounting-note{margin:15px 0 21px;padding:14px 18px;border-left:3px solid #6daac5;background:#132338;color:#b8cbe0;font-size:13px;line-height:1.65;border-radius:0 10px 10px 0}
