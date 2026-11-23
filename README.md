@@ -8,6 +8,8 @@ The static GitHub Pages site tracks the [Ethereum mainnet HOT bridge](https://et
 
 | Dashboard metric | Source and meaning |
 | --- | --- |
+| **Estimated bridge TVL (USD)** | Current Raindex vault HOT balance × CoinGecko's USD market price for Holo (API ID `holotoken`). This is an estimate of the USD value of *this bridge vault*, not all Unyt/Holo ecosystem assets or DeFi TVL. Missing, invalid, or over-two-hour-old market quotes show a dash; on-chain metrics still update. |
+| **HOT market price (USD)** | Latest accepted CoinGecko HOT/USD quote and its source timestamp. Price data is independent from the on-chain accounting snapshot. |
 | **Currently locked** | `HoloLockVault.vaultBalance()` → HOT in the specific Raindex V6 vault owned by the bridge contract. NOT the HOT balance on the bridge's own Ethereum address. |
 | **HOT supply bridged (%)** | The vault balance divided by Ethereum HOT ERC-20 `totalSupply()` × 100. Total supply is read on-chain, not hard-coded or equated with circulating supply. |
 | **Total bridged in** | Sum of `Lock(address,uint256,bytes32,uint256)` events emitted by the bridge contract. Actual bridge lock calls, not arbitrary ERC-20 deposits. |
@@ -40,13 +42,13 @@ The [HoloLockVault contract source](https://github.com/unytco/raindex-orders/blo
 
 1. Create a public GitHub repository such as `holo-unyt-tracker` (or use your existing repository).
 2. Upload **all** files from this ZIP to the repository root, including `.github/workflows/update.yml`. For an existing deployment, replace the files while preserving the directory structure. Git `push` handles the hidden `.github` folder most reliably.
-3. Get an [Etherscan API key](https://etherscan.io/myapikey), then go to **Settings → Secrets and variables → Actions** and set the repository secret `ETHERSCAN_API_KEY`. Do not put the key in source code.
+3. Get an [Etherscan API key](https://etherscan.io/myapikey), then go to **Settings → Secrets and variables → Actions** and set the repository secret `ETHERSCAN_API_KEY`. For the optional USD TVL metric, also get a [CoinGecko Demo API key](https://www.coingecko.com/en/api) and add it as the repository secret `COINGECKO_API_KEY`. Never put either key in source code.
 4. Enable Actions workflow permissions for writing repository contents under **Settings → Actions → General → Workflow permissions → Read and write permissions** if your repository requires it.
 5. Start **Actions → Update HOT bridge data → Run workflow**. The first run backfills historical logs, writes `data/events.json`, and generates `data/bridge.json`. Check the Actions log for API or reconciliation errors before relying on the metrics.
 6. Under **Settings → Pages**, choose **Deploy from a branch → main → / (root)**.
 7. The site will be at `https://YOUR-USERNAME.github.io/holo-unyt-tracker/` if you use those repository names. The new dashboard deliberately shows placeholders until a successful schema-version 2 data sync, rather than relabeling older approximate figures as verified.
 
-No additional paid service or API secret is required beyond your existing Etherscan key *if the API endpoints and rate limits stay available on your Etherscan plan*. If Etherscan changes its access rules or the bridge's ABI or vault accounting changes, the workflow will need maintenance. GitHub Pages is public: the event cache also contains **public Ethereum wallet addresses** from the bridge events.
+Verified HOT metrics only require your existing Etherscan key. To display the **optional USD TVL** and HOT/USD price cards, add a CoinGecko **Demo API key** as `COINGECKO_API_KEY` (the Demo tier may be free subject to provider limits). Without it, both cards show dashes and on-chain metrics still update. CoinGecko prices are fetched server-side during the approximately 30-minute GitHub Actions sync; keys are not sent to the browser. The estimate uses the *current* HOT vault balance and latest acceptable HOT/USD quote, so do not interpret the cumulative-deposits chart as historical TVL. All services remain subject to their API availability and limits. If Etherscan changes its access rules or the bridge's ABI or vault accounting changes, the workflow will need maintenance. GitHub Pages is public: the event cache also contains **public Ethereum wallet addresses** from the bridge events.
 
 ## Local tests and preview
 
@@ -65,6 +67,7 @@ The preview will show placeholders until `update.py` has run with `ETHERSCAN_API
 - [Raindex V6 mainnet deployment documentation](https://github.com/unytco/raindex-orders/blob/main/DEPLOY.md)
 - [Etherscan event-log API](https://docs.etherscan.io/api-reference/endpoint/getlogs)
 - [Etherscan eth_call API](https://docs.etherscan.io/api-reference/endpoint/ethcall)
+- [CoinGecko Simple Price API](https://coingecko-api-v3.readme.io/reference/simple-price)
 
 ### On-chain addresses
 
