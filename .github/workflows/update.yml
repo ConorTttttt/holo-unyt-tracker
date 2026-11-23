@@ -26,9 +26,10 @@ jobs:
           python-version: '3.12'
       - name: Run offline regression tests
         run: python -m unittest discover -s tests -v
-      - name: Fetch Etherscan data
+      - name: Fetch Etherscan data and optional CoinGecko price
         env:
           ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
         run: python update.py
       - name: Commit refreshed data
         run: |
