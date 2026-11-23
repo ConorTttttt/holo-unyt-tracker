@@ -1,9 +1,11 @@
 """Offline regression tests; no Ethereum credentials or internet required."""
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 from unittest.mock import patch
 
@@ -218,6 +220,38 @@ class TestSnapshots(unittest.TestCase):
                     tracker.main()
             self.assertFalse(cache.exists())
             self.assertEqual(out.read_text(),'{"existing":true}')
+
+
+class TestCoinGeckoTVL(unittest.TestCase):
+    def test_usd_valuation_uses_current_vault_balance_not_total_deposits(self):
+        metrics = {'currentLocked': '24171035.785336', 'totalDeposited': '99999999'}
+        tracker.attach_tvl(metrics, (Decimal('0.00033'), NOW.isoformat()))
+        self.assertEqual(metrics['tvlUsd'], '7976.44180916088')
+        self.assertEqual(metrics['hotPriceUsd'], '0.00033')
+        self.assertEqual(metrics['priceSource'], 'CoinGecko')
+        self.assertEqual(metrics['priceUpdatedAt'], NOW.isoformat())
+
+    def test_missing_quote_does_not_change_verified_bridge_metrics(self):
+        metrics = {'currentLocked': '100', 'totalDeposited': '200'}
+        tracker.attach_tvl(metrics, None)
+        self.assertEqual(metrics['currentLocked'], '100')
+        self.assertIsNone(metrics['tvlUsd'])
+        self.assertIsNone(metrics['hotPriceUsd'])
+
+    def test_price_fetch_requires_secret_and_rejects_stale_quotes(self):
+        with patch.object(tracker, 'COINGECKO_API_KEY', ''):
+            with patch.object(tracker.urllib.request, 'urlopen') as mocked:
+                self.assertIsNone(tracker.fetch_hot_usd_quote(NOW))
+                mocked.assert_not_called()
+        with patch.object(tracker, 'COINGECKO_API_KEY', 'test-demo-key'):
+            fresh = json.dumps({'holotoken': {'usd': 0.00033,
+                               'last_updated_at': int(NOW.timestamp())}}).encode()
+            with patch.object(tracker.urllib.request, 'urlopen', return_value=io.BytesIO(fresh)):
+                self.assertEqual(tracker.fetch_hot_usd_quote(NOW)[0], Decimal('0.00033'))
+            stale = json.dumps({'holotoken': {'usd': 0.00033,
+                               'last_updated_at': int(NOW.timestamp()) - 7201}}).encode()
+            with patch.object(tracker.urllib.request, 'urlopen', return_value=io.BytesIO(stale)):
+                self.assertIsNone(tracker.fetch_hot_usd_quote(NOW))
 
 
 class TestPagination(unittest.TestCase):
