@@ -29,6 +29,8 @@ ROOT = Path(__file__).resolve().parent
 OUT = ROOT / 'data' / 'bridge.json'
 CACHE = ROOT / 'data' / 'events.json'
 KEY = os.environ.get('ETHERSCAN_API_KEY', '').strip()
+COINGECKO_API_KEY = os.environ.get('COINGECKO_API_KEY', '').strip()
+COINGECKO_PRICE_API = 'https://api.coingecko.com/api/v3/simple/price'
 
 # Keccak-256 event signatures (Ethereum Keccak, NOT NIST SHA3-256).
 # Lock(address,uint256,bytes32,uint256) -- see src/HoloLockVault.sol
@@ -330,6 +332,53 @@ def build_metrics(cache, vault_raw: int, supply_raw: int, now: datetime):
     }
 
 
+def fetch_hot_usd_quote(now: datetime):
+    """Optional CoinGecko Demo price; never let a price outage block verified metrics.
+
+    CoinGecko API ID 'holotoken' maps to the Ethereum HOT token. Requiring a
+    private Demo key keeps credentials out of the public GitHub Pages frontend.
+    """
+    if not COINGECKO_API_KEY:
+        return None
+    params = urllib.parse.urlencode({
+        'ids': 'holotoken', 'vs_currencies': 'usd', 'include_last_updated_at': 'true'
+    })
+    url = COINGECKO_PRICE_API + '?' + params
+    headers = {
+        'Accept': 'application/json',
+        'User-Agent': 'community-holo-unyt-tracker/2.0',
+        'x-cg-demo-api-key': COINGECKO_API_KEY,
+    }
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=15) as response:
+            payload = json.load(response)
+        quote = payload['holotoken']
+        price = Decimal(str(quote['usd']))
+        stamp = quote['last_updated_at']
+        if isinstance(stamp, bool) or not isinstance(stamp, int):
+            raise ValueError('Invalid CoinGecko price timestamp')
+        quoted_at = datetime.fromtimestamp(stamp, tz=timezone.utc)
+        age_seconds = (now - quoted_at).total_seconds()
+        if not price.is_finite() or price <= 0 or not (-300 <= age_seconds <= 7200):
+            raise ValueError('Invalid or stale CoinGecko HOT price')
+        return price, quoted_at.isoformat()
+    except (urllib.error.URLError, OSError, TimeoutError, ValueError,
+            TypeError, KeyError, ArithmeticError, OverflowError) as exc:
+        # Do not print the URL or request headers: they may contain credentials.
+        print(f'Warning: CoinGecko quote unavailable ({type(exc).__name__}); TVL omitted')
+        return None
+
+
+def attach_tvl(metrics: dict, quote):
+    """TVL is the USD market value of CURRENT vault HOT, not bridge-wide issued HOT."""
+    price, updated = quote if quote is not None else (None, None)
+    metrics['hotPriceUsd'] = format(price, 'f') if price is not None else None
+    metrics['tvlUsd'] = format(Decimal(metrics['currentLocked']) * price, 'f') if price is not None else None
+    metrics['priceSource'] = 'CoinGecko' if price is not None else None
+    metrics['priceUpdatedAt'] = updated
+    return metrics
+
+
 def write_json(path: Path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     staging = path.with_name(path.name + '.tmp')
@@ -369,7 +418,9 @@ def main():
         cache = ingest(cache, deployed, next_head)
     vault_raw = call_latest(BRIDGE, VAULT_BALANCE)
     supply_raw = call_latest(TOKEN, SUPPLY_SELECTOR)
-    metrics = build_metrics(cache, vault_raw, supply_raw, datetime.now(timezone.utc))
+    now = datetime.now(timezone.utc)
+    metrics = build_metrics(cache, vault_raw, supply_raw, now)
+    attach_tvl(metrics, fetch_hot_usd_quote(now))
     # Only persist once ALL API calls, decoding, and reconciliation succeed.
     write_json(CACHE, cache)
     write_json(OUT, metrics)
